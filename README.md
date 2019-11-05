@@ -7,23 +7,7 @@ This code for infrastructure (formerly `IaC`) will let you up and run your infra
 These instructions will get you a copy of the project up and running on your AWS for testing and staging purposes.
 
 ```bash
-$ ssh-keygen
-Generating public/private rsa key pair.
-Enter file in which to save the key (/Users/plakhera/.ssh/id_rsa):⌨ /tmp/id_rsa
-Enter passphrase (empty for no passphrase):
-Enter same passphrase again:
-Your identification has been saved in /tmp/id_rsa.
-Your public key has been saved in /tmp/id_rsa.pub.
-The key fingerprint is:
-XXXXXXXXXXXXX
-The key\'s randomart image is:
-+---[RSA 2048]----+
-|                 |
-|   . . .   .   . |
-...................
-+----[SHA256]-----+
-$ terraform init
-
+$ ./startup.sh
 ```
 
 ### Prerequisites

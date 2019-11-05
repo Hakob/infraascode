@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-west-2"
+  region = "${var.region}"
 }
 
 # Query all avilable Availibility Zone
@@ -12,8 +12,8 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  tags {
-    Name = "my-test-vpc"
+  tags = {
+    Name = "cookbook-vpc"
   }
 }
 
@@ -22,13 +22,12 @@ resource "aws_vpc" "main" {
 resource "aws_internet_gateway" "gw" {
   vpc_id = "${aws_vpc.main.id}"
 
-  tags {
-    Name = "my-test-igw"
+  tags = {
+    Name = "cookbook-igw"
   }
 }
 
 # Public Route Table
-
 resource "aws_route_table" "public_route" {
   vpc_id = "${aws_vpc.main.id}"
 
@@ -37,8 +36,8 @@ resource "aws_route_table" "public_route" {
     gateway_id = "${aws_internet_gateway.gw.id}"
   }
 
-  tags {
-    Name = "my-test-public-route"
+  tags = {
+    Name = "cookbook-public-route"
   }
 }
 
@@ -47,39 +46,39 @@ resource "aws_route_table" "public_route" {
 resource "aws_default_route_table" "private_route" {
   default_route_table_id = "${aws_vpc.main.default_route_table_id}"
 
-  tags {
-    Name = "my-private-route-table"
+  tags = {
+    Name = "cookbook-private-route-table"
   }
 }
 
 # Public Subnet
 resource "aws_subnet" "public_subnet" {
-  count                   = 2
+  count                   = "${var.instance_count}"
   cidr_block              = "${var.public_cidrs[count.index]}"
   vpc_id                  = "${aws_vpc.main.id}"
   map_public_ip_on_launch = true
   availability_zone       = "${data.aws_availability_zones.available.names[count.index]}"
 
-  tags {
-    Name = "my-test-public-subnet.${count.index + 1}"
+  tags = {
+    Name = "cookbook-public-subnet.${count.index + 1}"
   }
 }
 
 # Private Subnet
 resource "aws_subnet" "private_subnet" {
-  count             = 2
+  count             = "${var.instance_count}"
   cidr_block        = "${var.private_cidrs[count.index]}"
   vpc_id            = "${aws_vpc.main.id}"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
 
-  tags {
-    Name = "my-test-private-subnet.${count.index + 1}"
+  tags = {
+    Name = "cookbook-private-subnet.${count.index + 1}"
   }
 }
 
 # Associate Public Subnet with Public Route Table
 resource "aws_route_table_association" "public_subnet_assoc" {
-  count          = "${aws_subnet.public_subnet.count}"
+  count          = length(aws_subnet.public_subnet)
   route_table_id = "${aws_route_table.public_route.id}"
   subnet_id      = "${aws_subnet.public_subnet.*.id[count.index]}"
   depends_on     = ["aws_route_table.public_route", "aws_subnet.public_subnet"]
@@ -87,34 +86,85 @@ resource "aws_route_table_association" "public_subnet_assoc" {
 
 # Associate Private Subnet with Private Route Table
 resource "aws_route_table_association" "private_subnet_assoc" {
-  count          = "${aws_subnet.private_subnet.count}"
+  count          = length(aws_subnet.private_subnet)
   route_table_id = "${aws_default_route_table.private_route.id}"
   subnet_id      = "${aws_subnet.private_subnet.*.id[count.index]}"
   depends_on     = ["aws_default_route_table.private_route", "aws_subnet.private_subnet"]
 }
 
 # Security Group Creation
-resource "aws_security_group" "test_sg" {
-  name   = "my-test-sg"
+resource "aws_security_group" "cookbook_frontend_sg" {
+  name   = "cookbook-front-sg"
   vpc_id = "${aws_vpc.main.id}"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 9200
+    to_port     = 9200
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port        = -1
+    to_port          = -1
+    protocol         = "icmp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "front-default-rules"
+  }
 }
 
-# Ingress Security Port 22
-resource "aws_security_group_rule" "ssh_inbound_access" {
-  from_port         = 22
-  protocol          = "tcp"
-  security_group_id = "${aws_security_group.test_sg.id}"
-  to_port           = 22
-  type              = "ingress"
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+resource "aws_security_group" "cookbook_backend_sg" {
+  name   = "cookbook-back-sg"
+  vpc_id = "${aws_vpc.main.id}"
 
-# All OutBound Access
-resource "aws_security_group_rule" "all_outbound_access" {
-  from_port         = 0
-  protocol          = "-1"
-  security_group_id = "${aws_security_group.test_sg.id}"
-  to_port           = 0
-  type              = "egress"
-  cidr_blocks       = ["0.0.0.0/0"]
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port        = -1
+    to_port          = -1
+    protocol         = "icmp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "back-default-rules"
+  }
 }
