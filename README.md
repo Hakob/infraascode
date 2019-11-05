@@ -7,68 +7,26 @@ This code for infrastructure (formerly `IaC`) will let you up and run your infra
 These instructions will get you a copy of the project up and running on your AWS for testing and staging purposes.
 
 ```bash
-$ ./startup.sh
+$ git clone https://github.com/Hakob/infraascode.git
+$ cd infraascode/terraform
+$ terraform init
+$ cd .. && chmod o+x startup.sh
+$ ./startup.sh [plan|apply|destroy]
 ```
+
+#### With this steps will create passphraseless SSH key for further connections to instances.
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+Before make things done you need to install the following software on your host machine from where you will run this code
 
-```
-Give examples
-```
+#### Tools
 
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+* [ssh-keygen (required)](http://manpages.ubuntu.com/manpages/bionic/man1/ssh-keygen.1.html) - This SSH client tool required for generating key-pairs for connecting to remote machines
+* [Terraform (required)](https://www.terraform.io/downloads.html) - Infrastructure building tool
+* [Ansible (required)](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) - Used to generate RSS Feeds
+* [AWS CLI (required)](https://www.terraform.io/downloads.html) - IT automation tool
+* [jq (optional)](https://www.terraform.io/downloads.html) - JSON query is for parsing tf's output as needed
 
 ## Versioning
 
@@ -76,16 +34,8 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Hakob Arakelyan** - *Infra as Code* - [Hakob](https://github.com/Hakob)
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
