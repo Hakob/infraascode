@@ -23,5 +23,6 @@ module "application_load_balancer" {
   source     = "./application_load_balancer"
   region     = "${var.region}"
   front_sg   = "${module.vpc_networking.front_security_group}"
+  cb_vpc_id  = "${module.vpc_networking.cookbook_vpc_id}"
   subnet_ids = "${module.vpc_networking.public_subnets}"
 }
