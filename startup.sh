@@ -14,9 +14,10 @@ then
     fi
 elif [[ $1 == "destroy" ]];
 then
-    key_path="${HOME}/.ssh/terraform_provisioned"
-    echo "Deleting key-pair"
-    if [ -d "$key_path" ]; then
+    export TF_VAR_privkey_path="${HOME}/.ssh/terraform_provisioned"
+    export TF_VAR_pubkey_path="${TF_VAR_privkey_path}.pub"
+    if [ -f "$TF_VAR_privkey_path" ]; then
+      echo "Deleting key-pair"
       rm $TF_VAR_privkey_path
       rm $TF_VAR_pubkey_path
     fi
