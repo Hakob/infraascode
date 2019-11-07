@@ -48,7 +48,7 @@ resource "aws_instance" "front_instances" {
   provisioner "remote-exec" {
     inline = [
       "sudo yum update -y",
-      "sudo yum -qq install python -y"
+      "sudo yum -qq install python3 -y"
     ]
   }
 
@@ -76,7 +76,7 @@ resource "aws_instance" "back_instances" {
   provisioner "remote-exec" {
     inline = [
       "sudo yum update -y",
-      "sudo yum -qq install python -y"
+      "sudo yum -qq install python3 -y"
     ]
   }
 
@@ -100,6 +100,7 @@ resource "null_resource" "front_inventory" {
       >frontend.ini;
       echo "[front]" | tee -a frontend.ini;
       echo "${join("\n", aws_instance.front_instances.*.public_ip)}" | tee -a frontend.ini
+      echo "[front:vars]\nansible_python_interpreter=/usr/bin/python3"
     	EOT
   }
 }
@@ -119,6 +120,7 @@ resource "null_resource" "back_inventory" {
       >backend.ini;
       echo "[back]" | tee -a backend.ini;
       echo "${join("\n", aws_instance.back_instances.*.public_ip)}" | tee -a backend.ini
+      echo "[back:vars]\nansible_python_interpreter=/usr/bin/python3"
     	EOT
   }
 }

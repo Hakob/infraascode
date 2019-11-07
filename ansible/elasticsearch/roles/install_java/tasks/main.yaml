@@ -1,0 +1,6 @@
+--- # This task will install java
+
+- name: Install openjdk-8-jdk
+  yum:
+    name: openjdk-8-jdk
+    state: present
