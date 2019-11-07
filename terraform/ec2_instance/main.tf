@@ -49,20 +49,7 @@ resource "aws_instance" "front_instances" {
     inline = [
       "sudo yum update -y",
       "sudo yum -qq install python -y"
-      ]
-  }
-
-  provisioner "local-exec" {
-    working_dir = "../ansible/"
-    command     = <<EOT
-      if [ -f "frontend.ini" ]; then
-        echo "${self.public_ip}" | tee -a frontend.ini
-      else 
-        >frontend.ini;
-        echo "[front]" | tee -a frontend.ini;
-        echo "${self.public_ip}" | tee -a frontend.ini
-      fi
-    	EOT
+    ]
   }
 
   tags = {
@@ -93,21 +80,46 @@ resource "aws_instance" "back_instances" {
     ]
   }
 
-  provisioner "local-exec" {
-    working_dir = "../ansible/"
-    command     = <<EOT
-      if [ -f "backend.ini" ]; then
-        echo "${self.public_ip}" | tee -a backend.ini
-      else 
-        >backend.ini;
-        echo "[back]" | tee -a backend.ini;
-        echo "${self.public_ip}" | tee -a backend.ini
-      fi
-    	EOT
-  }
-
   tags = {
     Name = "BackEnd.${count.index + 1}"
+  }
+}
+
+resource "null_resource" "front_inventory" {
+  # Changes to any instance of the cluster requires re-provisioning
+  triggers = {
+    cluster_instance_ids = "${join(",", aws_instance.front_instances.*.id)}"
+  }
+
+  provisioner "local-exec" {
+    working_dir = "../ansible/"
+    command = <<EOT
+      if [ -f "frontend.ini" ]; then
+        rm frontend.ini
+      fi 
+      >frontend.ini;
+      echo "[front]" | tee -a frontend.ini;
+      echo "${join("\n", aws_instance.front_instances.*.public_ip)}" | tee -a frontend.ini
+    	EOT
+  }
+}
+
+resource "null_resource" "back_inventory" {
+  # Changes to any instance of the cluster requires re-provisioning
+  triggers = {
+    cluster_instance_ids = "${join(",", aws_instance.back_instances.*.id)}"
+  }
+
+  provisioner "local-exec" {
+    working_dir = "../ansible/"
+    command = <<EOT
+      if [ -f "backend.ini" ]; then
+        rm backend.ini
+      fi 
+      >backend.ini;
+      echo "[back]" | tee -a backend.ini;
+      echo "${join("\n", aws_instance.back_instances.*.public_ip)}" | tee -a backend.ini
+    	EOT
   }
 }
 
