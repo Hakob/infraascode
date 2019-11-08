@@ -18,8 +18,9 @@ $ ./startup.sh [plan|apply|destroy]
 
 And then after this you can run ansible's playbooks
 ```bash
-$ ansible-playbook -i frontend.ini -u root ansible/elasticsearch/playbooks/install_elasticsearch.yml
-$ ansible-playbook -i backend.ini -u root ansible/elasticsearch/playbooks/install_elasticsearch.yml
+$ cd ansible/
+$ ansible-playbook -i frontend.ini site.yml
+$ ansible-playbook -i backend.ini site.yml
 ```
 
 ### Prerequisites

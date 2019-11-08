@@ -1,0 +1,8 @@
+---
+es: elasticsearch-7.4.2
+src_dir: /usr/local/src
+es_url: https://artifacts.elastic.co/downloads/
+es_rpm: elasticsearch/elasticsearch-7.4.2-x86_64.rpm
+kibana_rpm: kibana/kibana-7.4.2-x86_64.rpm
+es_conf: /etc/elasticsearch
+es_port: 9200

@@ -1,0 +1,6 @@
+- name: Install-es-td
+  user: root
+  roles:
+    - es
+    - td-agent
+    - restart
