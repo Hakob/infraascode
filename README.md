@@ -16,6 +16,13 @@ $ ./startup.sh [plan|apply|destroy]
 
 #### With this steps will create passphraseless SSH key for further connections to instances.
 
+And then after this you can run ansible's playbooks
+```bash
+$ cd ansible/
+$ ansible-playbook -i frontend.ini site.yml
+$ ansible-playbook -i backend.ini site.yml
+```
+
 ### Prerequisites
 
 Before make things done you need to install the following software on your host machine from where you will run this code

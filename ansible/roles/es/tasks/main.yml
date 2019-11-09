@@ -1,0 +1,35 @@
+---
+- name: install java
+  yum: pkg={{ item }} state=installed
+  with_items:
+    - openjdk-8-jdk
+
+- name: download es
+  get_url: url={{ es_url }}/{{ es_rpm }} dest={{ src_dir }}/{{ es_rpm }} mode=0644
+
+- name: install es by yum
+  yum: name={{ src_dir }}/{{ es_rpm }} state=installed
+
+- name: download kibana for front
+  get_url: url={{ es_url }}/{{ kibana_rpm }} dest={{ src_dir }}/{{ kibana_rpm }} mode=0644
+  when: group_names[0] == "front"
+
+- name: install kibana for front by yum
+  yum: name={{ src_dir }}/{{ kibana_rpm }} state=installed
+  when: group_names[0] == "front"
+
+- name: ensure elasticsearch is running automatically at boot time
+  command: /sbin/chkconfig elasticsearch on
+
+- name: Copy es-config
+  template: src={{ es-config }} dest=/etc/elasticsearch/elasticsearch.yml mode=0644
+  notify: restart es
+
+- name: Add Plugin elasticsearch-head
+  command: /usr/share/elasticsearch/bin/plugin -install mobz/elasticsearch-head
+
+- name: Add Plugin elasticsearch-marvel
+  command: /usr/share/elasticsearch/bin/plugin -i elasticsearch/marvel/latest
+
+
+

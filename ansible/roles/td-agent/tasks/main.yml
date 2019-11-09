@@ -1,0 +1,19 @@
+---
+- name: install by yum
+  command: curl -L https://toolbelt.treasuredata.com/sh/install-redhat-td-agent3.sh | sh
+
+- name: ensure td-agent is running automatically at boot time
+  command: /sbin/chkconfig td-agent on
+
+- name: launching td-agent daemon
+  command: systemctl start td-agent.service
+
+- name: install fluent-plugin-elasticsearch by gem
+  command: td-agent-gem install fluent-plugin-elasticsearch --no-document
+
+- name: install fluent-plugin-elasticsearch by gem
+  command: td-agent-gem install fluent-plugin-dstat fluent-plugin-map
+
+- name: Copy td-agent.conf
+  template: src=td-agent.j2 dest=/etc/td-agent/td-agent.conf mode=0644 backup=yes
+  notify: restart td-agent

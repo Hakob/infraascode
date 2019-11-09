@@ -1,0 +1,15 @@
+bootstrap.memory_lock: false
+cluster.name: elasticsearch
+http.port: {{ es_port }}
+node.data: true
+node.ingest: true
+node.master: false
+node.max_local_storage_nodes: 1
+node.name: {{ hostvars[inventory_hostname].group_names[0] }}
+path.data: /mnt/lib/elasticsearch
+path.logs: /mnt/log/elasticsearch
+transport.tcp.port: 9300
+xpack.license.self_generated.type: basic
+xpack.security.enabled: false
+discovery.zen.ping.unicast.hosts: {{ ansible_play_batch }}
+network.host: [_local_, _site_]
