@@ -15,3 +15,9 @@ jobs:
       run: |
         echo Add other actions to build,
         echo test, and deploy your project.
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Print secret env
+        run: echo '${{ secrets.KUBECONFIG }}'
