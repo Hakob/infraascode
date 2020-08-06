@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # -*- coding: utf-8 -*-
+
 if [[ $1 == "apply" ]];
 then
     key_path="${HOME}/.ssh/created_by_terraform"
